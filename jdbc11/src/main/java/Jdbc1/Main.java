@@ -19,8 +19,22 @@ public class Main {
     static Connection conn;
 
     public static void main(String[] args) throws SQLException {
+
         try (Scanner sc = new Scanner(System.in)) {
             conn = DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
+            initDB();
+            addFlat("Saltov", "Praci 52", "53", "2","23500");
+            addFlat("Soln", "Ukrain 14", "84", "3","26800");
+            addFlat("Zalut", "Kropiv 56", "35", "1","20100");
+            addFlat("Komin", "Peremogy 22", "57", "2","24600");
+            addFlat("Indust", "Nezlam 18", "61", "3","26800");
+            addFlat("Komin", "Naukov 69", "36", "1","24000");
+            addFlat("Zalut", "Stadio 12", "49", "2","25450");
+            addFlat("Saltov", "Uzhviy 97", "53", "2","24800");
+            addFlat("Indust", "Heroiv 51", "72", "3","31150");
+            addFlat("Soln", "Yarosha 44", "33", "1","22650");
+            addFlat("Saltov", "Troley 35", "29", "1","25100");
+
             while( true ) {
                 System.out.println("1: view all flats");
                 System.out.println("2: 1 bedroom");
@@ -55,6 +69,21 @@ public class Main {
         }
     }
 
+    private static void initDB() throws SQLException {
+        Statement st = conn.createStatement();
+        try {
+            st.execute("DROP TABLE IF EXISTS flats");
+            st.execute("CREATE TABLE flats (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+                    "district VARCHAR(128) default null," +
+                    "address VARCHAR(128) default NULL," +
+                    "m2 VARCHAR(128) default NULL," +
+                    "bed VARCHAR(128) default null," +
+                    "price varchar(128) default null)");
+        } finally {
+            st.close();
+        }
+    }
+
     private static void viewFlats( String req ) throws SQLException {
         PreparedStatement ps = conn.prepareStatement(req);
         try {
@@ -79,6 +108,20 @@ public class Main {
             } finally {
                 rs.close(); // rs can't be null according to the docs
             }
+        } finally {
+            ps.close();
+        }
+    }
+
+    private static void addFlat( String district, String address, String area, String bed, String price ) throws SQLException {
+        PreparedStatement ps = conn.prepareStatement("INSERT INTO flats (district, address, m2, bed, price) VALUES(?, ?, ?, ?, ?)");
+        try {
+            ps.setString(1, district);
+            ps.setString(2, address);
+            ps.setString(3, area);
+            ps.setString(4, bed);
+            ps.setString(5, price);
+            ps.executeUpdate(); // for INSERT, UPDATE & DELETE
         } finally {
             ps.close();
         }
